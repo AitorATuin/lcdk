@@ -1,9 +1,56 @@
-module("CDK", package.seeall)
+local M = {}
+local M_bindings
 require "luarocks.require"
-require "alien"
-require "CDK.struct"
-require "CDK.Constants"
-require "CDK.alienize"
+local mkModule = require "MkModule"
+local alien = require "alien"
+local struct = require "CDK.struct"
+local alienize = require "CDK.alienize"
+
+-- Initialize CDK library
+local function initCDK (L)
+   local cdk = L.cdk
+   cdk.initCDKScreen:types(
+      {
+         ret = "void",
+         "pointer"
+   })
+   cdk.endCDK:types(
+      {
+         ret = "void"
+   })
+end
+
+-- Initialize module
+local init = function (L)
+end
+
+M_bindings = {
+   cdk = {
+      initCDKScreen = {
+         ret = "void", "pointer"
+      },
+      endCDK = { ret = "void" }
+   }
+}
+
+local moduleConf = {
+   configure = configure,
+   init = init,
+   libraries = {
+      {
+         name = "cdk",
+         libname = "cdk"
+      },
+      {
+         env = "LCDKSO",
+         name = "liblcdk",
+         libname = "liblcdk.so"
+      }
+   },
+   methods = M,
+   bindings = M_bindings
+}
+return mkModule.make(modulesonf)
 
 --[[
     * Function to implement here
@@ -20,7 +67,7 @@ require "CDK.alienize"
     unregisterCDKObject
 --]]
 
-local cdk = alien.load("cdk")
+--[[local cdk = alien.load("cdk")
 local lcdk, err = alienize("liblcdk.so", "LCDKSO")
 if not lcdk then
     error(string.format("Could not load liblcdk.so library: %s", err))
@@ -76,7 +123,7 @@ end
 -- }}}
 --
 -- CDKOBJS {{{
-local CDKOBJS = struct.defstruct{
+local CDKOBJS = struct.defStruct{
 	{"screenIndex", "int"},
 	{"screen", "pointer"},
 	{"fn", "pointer"},
@@ -172,7 +219,7 @@ eraseCDKScreen = cdk.eraseCDKScreen
 -- Fix this.
 -- Initialization needed because of how CDK reallocs memory
 -- see CDKreadFile and CDKallocStrings in cdk.c
-CDKFileContent = struct.defstruct{
+CDKFileContent = struct.defStruct{
 	{"info", "pointer"},
 	{"lines", "int"}
 }
@@ -182,7 +229,7 @@ lcdk._CDKReadFile:types{
 }
 CDKreadFile = lcdk._CDKReadFile
 setCDKViewerBackgroundColor = function (w, color)
-	local obj = lcdk._getObj(w) 
+	local obj = lcdk._getObj(w)
 	cdk.setCDKObjectBackgroundColor(obj, color)
 end
 --[[cdk.CDKreadFile:types{
@@ -191,6 +238,7 @@ end
 	"pointer"
 }
 CDKreadFile = cdk.CDKreadFile--]]
+--[[
 -- }}}
 -- }}}-- end cdk interfaces }}}
 -- lcdk {{{
@@ -210,7 +258,7 @@ lcdk._color_pair:types{
 	ret = "pointer",
 	"int"
 }
-COLOR_PAIR = cdk._color_pair
+COLOR_PAIR = lcdk._color_pair
 -- end lcdk }}}
 -- lua functions {{{
 startCDKDebug = function (file)
@@ -229,6 +277,6 @@ end
 
 stopCDKDebug = function ()
 	DEBUGFD:close()
-end
+end--]]
 -- }}}
 -- vi: set foldmethod=marker foldlevel=0:

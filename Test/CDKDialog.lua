@@ -1,7 +1,9 @@
-package.path = "Build/Shared/?.lua;Build/Shared/?/?.lua;" .. package.path
+local HOME = os.getenv("HOME")
+local LOCALLUAPATH = HOME .. "/.lua/share/?.lua;" .. HOME ..  "/.lua/share/?/?.lua"
+package.path = package.path .. ";" .. LOCALLUAPATH
 
 require "luarocks.require"
-require "Curses"
+local Curses = require "Curses".configure()
 require "CDK"
 require "CDK.Dialog"
 
@@ -37,7 +39,6 @@ CDK_Screen = CDK.initCDKScreen(Main_Window)
 CDK.initCDKColor()
 Width=1
 Height=3
-local dialog = CDK.newCDKDialog(CDK_Screen, Width/2, Height/2, dialogText, buttons, 
+local dialog = CDK.newCDKDialog(CDK_Screen, Width/2, Height/2, dialogText, buttons,
     1234, CDK.TRUE, CDK.TRUE, CDK.FALSE)
 local a = CDK.activateCDKDialog(dialog, true)
-

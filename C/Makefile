@@ -6,7 +6,7 @@ DATADIR = $(PDIR)/Data
 BUILDLIBDIR = $(PDIR)/Build/Library
 CC := gcc
 DEBUG := 0
-CCOPTS := -g `cdk5-config --cflags`
+CCOPTS := -g `cdk5-config --cflags` -fPIC
 
 LIBNAME = lib`echo $(PROJECT) | tr A-Z a-z`
 LIBNAMESO = $(LIBNAME).$(PROJECTVER).so
@@ -39,5 +39,3 @@ clean:
 	@rm lcdk.o 2>/dev/null || true
 #	@rm $(LIBNAMESO).0.1  2>/dev/null || true
 	@rm $(BUILDLIBDIR)/$(LIBNAMESO) 2>/dev/null || true
-
-
